@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Blog</title>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+</head>
+<body>
+<h1>All Posts</h1>
+<button id="btnLoadPosts">Load Posts</button>
+<select id="posts"></select>
+<button id="btnViewPost">View</button>
+<h1 id="post-title">Post Details</h1>
+<ul id="post-body"></ul>
+<h2>Comments</h2>
+<ul id="post-comments"></ul>
+<script src="solution.js"></script>
+<script>
+    attachEvents();
+    function attachEvents(){
+        const appId = 'kid_rk0KOc2Wx';
+        const base = 'https://baas.kinvey.com/appdata/${appId}/';
+        const userName = 'peter';
+        const password = 'p';
+        const authorizationHeader = {Authorization: 'Basic ' + btoa(`${userName}:${password}`)};
+
+        $('#btnLoadPosts').on('click', loadPosts);
+        $('#btnViewPost').on('click', loadPostDetails);
+
+        function loadPosts() {
+            $.get({
+                url: apiBaseUrl + 'posts',
+                headers: authorizationHeader
+            }).then(fillDropDownMenu).catch(renderError);
+        }
+
+        function appendPosts(posts) {
+            let menu = $('#posts');
+            menu.empty();
+            for (let post of posts) {
+                menu.append(createOptionItem(post.title, post._id));
+            }
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Phonebook</title>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+</head>
+<body>
+<h1>Phonebook</h1>
+<ul id="phonebook"></ul>
+<button id="btnLoad">Load</button>
+
+<h2>Create Contact</h2>
+Person: <input type="text" id="person"/>
+<br>
+Phone: <input type="text" id="phone"/>
+<br>
+<button id="btnCreate">Create</button>
+<script>
+    attachEvents();
+    function attachEvents(){
+        $('#btnLoad').on('click', loadContacts);
+        $('#btnCreate').on('click',createContact);
+        let base ='https://phonebook-nakov.firebaseio.com/phonebook';
+
+        function loadContacts(){
+            $('#phonebook').empty();
+            $.get(base + '.json').then(display).catch(error);
+        }
+
+        function error(err) {
+            $("#phonebook").append($("<li>Error</li>"));
+        }
+
+        function display(contacts) {
+            for (let key in contacts) {
+                let person = contacts[key]['person'];
+                let phone = contacts[key]['phone'];
+                let li = $("<li>");
+                li.text(person + ': ' + phone + ' ');
+                $("#phonebook").append(li);
+                li.append($("<button>[Delete]</button>")
+                        .on('click', function() { deleteContact(key) }));
+            }
+        }
+
+        function createContact() {
+            let newContactJSON = JSON.stringify({
+                person: $('#person').val(),
+                phone: $('#phone').val()
+            });
+            $.post(base + '.json', newContactJSON)
+                    .then(loadContacts)
+                    .catch(error);
+            $('#person').val('');
+            $('#phone').val('');
+        }
+
+        function deleteContact(key) {
+            let request = {
+                method: 'DELETE',
+                url: base + '/' + key + '.json'
+            };
+            $.ajax(request)
+                    .then(loadContacts)
+                    .catch(error);
+        }
+    }
+</script>
+</body>
+</html>

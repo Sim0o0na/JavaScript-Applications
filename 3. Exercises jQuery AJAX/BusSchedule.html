@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bus Schedule</title>
+    <style>
+        #schedule { text-align: center; width: 400px; }
+        input { width: 120px; }
+        #info { background-color:aquamarine; border:1px solid black; margin:0.25em; }
+        .info { font-size: 1.5em; padding: 0.25em; }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+</head>
+<body>
+<div id="schedule">
+    <div id="info"><span class="info">Not Connected</span></div>
+    <div id="controls">
+        <input id="depart" value="Depart" type="button" onclick="result.depart()">
+        <input id="arrive" value="Arrive" type="button" onclick="result.arrive()" disabled="true">
+    </div>
+</div>
+<script>
+    function solve() {
+        let base = 'https://judgetests.firebaseio.com/schedule/';
+        let initial = 'depot';
+        let currentStop = 'Depot';
+        function displayDepart(receivedJSON){
+            let stop = receivedJSON;
+            console.log(stop);
+            $('#info').find('span').text(`Next stop ${stop.name}`);
+            nextStop = stop['next'];
+            currentStop = stop['name'];
+        }
+        function depart(){
+            let url = base+initial+".json";
+            $.get(url).then(displayDepart);
+            $('#arrive').prop('disabled', false);
+            $('#depart').prop('disabled', true);
+        }
+
+        function arrive(){
+            $('#info').text("Arriving at " + currentStop);
+            initial = nextStop;
+            console.log("Next stop : " + initial);
+            $('#arrive').prop('disabled', true);
+            $('#depart').prop('disabled', false);
+        }
+
+        return { depart, arrive };
+    }
+    let result = solve();
+</script>
+</body>
+</html>
